@@ -596,4 +596,155 @@ To improve performance:
 This ensures:
 - High scalability  
 - Low latency  
-- Better user experience  
+- Better user experience
+
+---
+
+# 📌 Stage 5 — Reliable & Scalable Notification Delivery
+
+## 🧠 Objective
+Redesign the notification system to handle bulk delivery (50,000 users) reliably and efficiently, avoiding failures and performance bottlenecks.
+
+---
+
+## ❗ Problems in Given Implementation
+
+### 1. Sequential Processing
+- Loop processes one user at a time → very slow
+
+### 2. No Fault Tolerance
+- If email fails midway → system breaks
+- No retry mechanism
+
+### 3. Tight Coupling
+- Email + DB + Push are tightly linked
+- Failure in one affects others
+
+### 4. No Scalability
+- Cannot handle large volume (50,000 users)
+
+---
+
+## ⚠️ Scenario: Email Failed for 200 Users
+
+Problem:
+- 49,800 users succeeded
+- 200 users missed notifications
+
+👉 Current system has **no retry or recovery mechanism**
+
+---
+
+## 🚀 Proposed Solution — Event-Driven Architecture
+
+### 🔑 Key Idea:
+Decouple the system using **message queues (Kafka / RabbitMQ)**
+
+---
+
+## 🏗️ New Flow
+
+1. HR triggers "Notify All"
+2. System pushes events to queue
+3. Workers process notifications asynchronously:
+   - Email Service
+   - DB Service
+   - Push Notification Service
+
+---
+
+## ✅ Revised Pseudocode
+
+function notify_all(student_ids, message):
+    for student_id in student_ids:
+        publish_to_queue({
+            "studentId": student_id,
+            "message": message
+        })
+
+---
+
+## 🧩 Worker Processing
+
+### Email Worker
+
+function process_email(event):
+    try:
+        send_email(event.studentId, event.message)
+    except:
+        retry(event)
+
+---
+
+### DB Worker
+
+function process_db(event):
+    save_to_db(event.studentId, event.message)
+
+---
+
+### Push Worker
+
+function process_push(event):
+    push_to_app(event.studentId, event.message)
+
+---
+
+## 🔁 Retry Mechanism
+
+- Failed jobs are retried automatically
+- Use exponential backoff
+
+Example:
+- Retry after 1s → 5s → 30s
+
+---
+
+## 💡 Should DB Save and Email Happen Together?
+
+❌ No (bad practice)
+
+### Why?
+- If email fails → DB insert also fails (data loss)
+- Tight coupling reduces reliability
+
+### ✅ Correct Approach:
+- Handle each operation independently
+- Use eventual consistency
+
+---
+
+## ⚡ Additional Improvements
+
+### 1. Batch Processing
+Process users in batches (e.g., 1000 at a time)
+
+### 2. Idempotency
+Avoid duplicate notifications using unique IDs
+
+### 3. Dead Letter Queue (DLQ)
+Store permanently failed messages for analysis
+
+### 4. Monitoring
+Track failures using logs and alerts
+
+---
+
+## 📊 Benefits of New Design
+
+- Highly scalable (handles 50,000+ users)
+- Fault-tolerant (failures are retried)
+- Faster processing (parallel workers)
+- Loose coupling between services
+
+---
+
+## 🏁 Conclusion
+
+The redesigned system:
+- Uses asynchronous processing  
+- Ensures reliability with retries  
+- Improves performance with parallel execution  
+- Prevents data loss using decoupled architecture  
+
+This approach is production-ready and suitable for large-scale systems.
