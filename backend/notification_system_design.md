@@ -748,3 +748,58 @@ The redesigned system:
 - Prevents data loss using decoupled architecture  
 
 This approach is production-ready and suitable for large-scale systems.
+
+
+---
+
+# 📌 Stage 6 — Priority Notification System
+
+## 🧠 Objective
+Display top K priority unread notifications based on type and recency.
+
+---
+
+## ⚙️ Priority Logic
+
+Priority Score = Type Weight + Recency
+
+Weights:
+- Placement → 3
+- Result → 2
+- Event → 1
+
+Newer notifications get higher priority.
+
+---
+
+## 🚀 Approach
+
+1. Fetch notifications from API  
+2. Assign score using type + timestamp  
+3. Sort notifications by score  
+4. Return top K (e.g., 10)  
+
+---
+
+## ⚡ Optimization
+
+Instead of full sorting:
+- Use Min Heap of size K  
+- Time Complexity: O(n log k)  
+
+---
+
+## 🔄 Handling Continuous Data
+
+- Use streaming / queue-based updates  
+- Maintain heap dynamically  
+- Replace lowest priority when new notification arrives  
+
+---
+
+## 🏁 Conclusion
+
+This approach ensures:
+- Efficient priority handling  
+- Fast retrieval of top notifications  
+- Scalable solution for real-time systems  
