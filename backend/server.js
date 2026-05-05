@@ -1,8 +1,10 @@
 const express = require("express");
+const axios = require("axios");
 const dotenv = require("dotenv");
 
 const requestLogger = require("./logging_middleware/requestLogger");
 const Log = require("./logging_middleware/logger");
+const runScheduler = require("./vehicle_maintenance_scheduler/scheduler");
 
 dotenv.config();
 
@@ -54,6 +56,8 @@ app.use((err, req, res, next) => {
     error: "Internal Server Error",
   });
 });
+
+runScheduler();
 
 const PORT = process.env.PORT || 5000;
 
