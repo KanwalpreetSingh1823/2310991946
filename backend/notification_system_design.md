@@ -436,4 +436,164 @@ Use Redis for frequently accessed notifications
 - Original query is correct but inefficient  
 - Proper indexing drastically improves performance  
 - Avoid unnecessary indexes  
-- Use pagination and filtering for scalability  
+- Use pagination and filtering for scalability
+
+---
+
+# 📌 Stage 4 — Performance Optimization & Scalability Strategy
+
+## 🧠 Objective
+Improve system performance by reducing database load caused by frequent notification fetching on every page load.
+
+---
+
+## ⚠️ Problem Statement
+
+- Notifications are fetched on every page load
+- Database is getting overwhelmed
+- Increased latency and poor user experience
+
+---
+
+## 🚀 Proposed Solutions
+
+---
+
+## ✅ 1. Caching (Redis)
+
+### Approach:
+- Store user notifications in Redis cache
+- On request:
+  - Check cache first
+  - If cache miss → fetch from DB → update cache
+
+### Flow:
+1. User requests notifications  
+2. Check Redis  
+3. If exists → return instantly  
+4. Else → fetch from DB → store in Redis → return  
+
+### Benefits:
+- Reduces DB load significantly  
+- Faster response time  
+
+### Trade-offs:
+- Cache invalidation complexity  
+- Slight memory overhead  
+
+---
+
+## ✅ 2. Pagination (Lazy Loading)
+
+### Approach:
+- Do not fetch all notifications at once
+- Fetch limited data (e.g., 20 per request)
+
+### Example:
+GET /notifications?userId=123&page=1&limit=20
+
+### Benefits:
+- Reduces DB query size  
+- Improves response time  
+
+### Trade-offs:
+- Multiple API calls required  
+- Slight increase in client-side logic  
+
+---
+
+## ✅ 3. Push-Based Notifications (WebSockets)
+
+### Approach:
+- Instead of polling, push notifications in real-time
+
+### Flow:
+1. Client opens WebSocket connection  
+2. Server pushes new notifications instantly  
+
+### Benefits:
+- Eliminates repeated API calls  
+- Real-time user experience  
+
+### Trade-offs:
+- More complex implementation  
+- Requires connection management  
+
+---
+
+## ✅ 4. Background Processing (Queue System)
+
+### Approach:
+- Use message queue (Kafka / RabbitMQ)
+- Process notification creation asynchronously
+
+### Flow:
+1. Event occurs  
+2. Push to queue  
+3. Worker processes and stores notification  
+
+### Benefits:
+- Reduces load on main application  
+- Improves system reliability  
+
+### Trade-offs:
+- Increased system complexity  
+- Requires queue infrastructure  
+
+---
+
+## ✅ 5. Database Optimization
+
+- Use proper indexing (from Stage 3)  
+- Use read replicas for scaling reads  
+- Partition large tables  
+
+### Benefits:
+- Faster query performance  
+- Scalable database architecture  
+
+---
+
+## ✅ 6. Notification Aggregation
+
+### Approach:
+- Combine multiple notifications into one
+
+### Example:
+Instead of:
+- "Amazon hiring"
+- "Google hiring"
+
+Show:
+- "2 new placement notifications"
+
+### Benefits:
+- Reduces number of records  
+- Better user experience  
+
+### Trade-offs:
+- Slight loss of granularity  
+
+---
+
+## ⚡ Recommended Final Architecture
+
+- Redis → caching layer  
+- WebSockets → real-time updates  
+- Queue (Kafka/RabbitMQ) → async processing  
+- Database → persistent storage  
+
+---
+
+## 🏁 Conclusion
+
+To improve performance:
+- Use caching to reduce DB load  
+- Implement pagination to limit data  
+- Use WebSockets for real-time updates  
+- Introduce queues for asynchronous processing  
+
+This ensures:
+- High scalability  
+- Low latency  
+- Better user experience  
