@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const requestLogger = require("./logging_middleware/requestLogger");
 const Log = require("./logging_middleware/logger");
 const runScheduler = require("./vehicle_maintenance_scheduler/scheduler");
+const runPrioritySystem = require("./notification_app_be/priorityNotifications");
 
 dotenv.config();
 
@@ -58,6 +59,7 @@ app.use((err, req, res, next) => {
 });
 
 runScheduler();
+runPrioritySystem();
 
 const PORT = process.env.PORT || 5000;
 
