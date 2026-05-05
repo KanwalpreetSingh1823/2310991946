@@ -293,4 +293,147 @@ This database design ensures:
 - High scalability  
 - Efficient read/write operations  
 - Real-time notification handling  
-- Optimized performance with indexing and sharding  
+- Optimized performance with indexing and sharding
+
+
+---
+
+# 📌 Stage 3 — Query Optimization & Indexing Strategy
+
+## 🧠 Objective
+Analyze the performance of an existing SQL query, identify bottlenecks, and propose optimizations for large-scale data.
+
+---
+
+## 🔍 Given Query
+
+SELECT * FROM notifications
+WHERE studentID = 1042 AND isRead = false
+ORDER BY createdAt DESC;
+
+---
+
+## ❗ Is this query accurate?
+
+Yes, functionally the query is correct because:
+- It fetches unread notifications for a specific student
+- It sorts them by latest notifications
+
+However, it is **not optimized for large-scale data**.
+
+---
+
+## ⚠️ Why is this query slow?
+
+### 1. Full Table Scan
+Without proper indexing, the database scans the entire table (millions of rows).
+
+### 2. Sorting Cost (ORDER BY)
+Sorting large datasets without index support is expensive.
+
+### 3. High Data Volume
+- 50,000 students
+- 5,000,000 notifications  
+→ Leads to heavy I/O operations
+
+---
+
+## ❌ Should we add index on every column?
+
+No — this is a bad practice.
+
+### Why?
+- Increases write cost (INSERT/UPDATE become slower)
+- Consumes more storage
+- Indexes may not be used effectively
+
+👉 We should create **targeted indexes based on query patterns**
+
+---
+
+## ✅ Optimized Index Strategy
+
+### Best Index (Composite Index)
+
+CREATE INDEX idx_notifications_user_read_created
+ON notifications (studentID, isRead, createdAt DESC);
+
+---
+
+## 💡 Why this works
+
+- Filters using studentID → fast lookup  
+- Filters using isRead → reduces dataset  
+- Uses createdAt → avoids extra sorting  
+
+👉 This makes query execution much faster
+
+---
+
+## ⚡ Optimized Query (Best Practice)
+
+SELECT id, title, message, type, createdAt
+FROM notifications
+WHERE studentID = 1042 AND isRead = false
+ORDER BY createdAt DESC
+LIMIT 20;
+
+---
+
+## 🚀 Improvements
+
+- Avoid SELECT * → fetch only required columns  
+- Use LIMIT → prevents large data transfer  
+- Index eliminates full table scan  
+
+---
+
+## 📊 Time Complexity (Before vs After)
+
+| Case | Complexity |
+|------|----------|
+| Without Index | O(n log n) |
+| With Index | O(log n) |
+
+---
+
+## 🔍 Additional Query Requirement
+
+### Find students who received "placement" notifications in last 7 days
+
+SELECT DISTINCT studentID
+FROM notifications
+WHERE notificationType = 'Placement'
+AND createdAt >= NOW() - INTERVAL 7 DAY;
+
+---
+
+## 📌 Index for this Query
+
+CREATE INDEX idx_type_date
+ON notifications (notificationType, createdAt);
+
+---
+
+## ⚡ Further Optimization Ideas
+
+### 1. Pagination
+Use OFFSET or cursor-based pagination
+
+### 2. Partitioning
+Partition table by date (e.g., monthly)
+
+### 3. Archiving
+Move old notifications to cold storage
+
+### 4. Caching
+Use Redis for frequently accessed notifications
+
+---
+
+## 🏁 Conclusion
+
+- Original query is correct but inefficient  
+- Proper indexing drastically improves performance  
+- Avoid unnecessary indexes  
+- Use pagination and filtering for scalability  
