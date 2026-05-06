@@ -183,6 +183,33 @@ Output
 
 ---
 
+# 📸 Output Screenshots
+
+## ✅ Logging Middleware API
+
+Demonstrates successful API logging with request body, response, and response time.
+
+<img width="942" height="642" alt="Postman_5tBkWjaf2R" src="https://github.com/user-attachments/assets/141501e5-0b8a-4f45-b433-bacf73bbf14c" />
+
+---
+
+## ✅ Priority Notification System Output
+
+Displays top priority notifications based on weighted scoring and recency.
+
+<img width="893" height="482" alt="Code_i8OxeTJe2L" src="https://github.com/user-attachments/assets/40bbea77-4dfa-45b4-89b5-0999530d8275" />
+
+---
+
+## ✅ Vehicle Maintenance Scheduler Output
+
+Shows optimized task selection and maximum impact calculation for depots using the Knapsack algorithm.
+
+<img width="778" height="403" alt="Code_1Kqyv87EIu" src="https://github.com/user-attachments/assets/415e0dda-a4b7-4f9a-b545-07b8c48fca55" />
+
+
+---
+
 # 🧠 Learnings
 
 - Designing systems for scale and performance  
